@@ -4,6 +4,7 @@ const Intern = require("./lib/Intern");
 const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
+const render = require("./lib/htmlRenderer");
 
 //Holding Data
 const employeeIds = [];
@@ -30,15 +31,19 @@ function validateEmail(input) {
 }
 
 async function askQuestions() {
-    await askManager();
-    await askNext();
+    let { managerName, managerId, managerEmail, managerNumber } = await askManager();
+    employeeIds.push(managerId);
+    employees.push(
+        new Manager(managerName, managerId, managerEmail, managerNumber)
+    );
+    askNext();
 
 }
 
 
-async function askManager() {
+function askManager() {
     console.log("Build your team");
-    await inquirer.prompt([{
+    return inquirer.prompt([{
         type: "input",
         message: "What is your managers name?",
         name: "managerName"
@@ -62,39 +67,47 @@ async function askManager() {
     }
 
     ])
-        .then((data) => {
-            employeeIds.push(data.managerId);
-            employees.push(
-                new Manager(data.managerName, data.managerId, data.managerEmail, data.managerNumber)
-            );
 
-        });
+
 }
 
 async function askNext() {
-    await inquirer.prompt({
+    let { another_teammate } = await inquirer.prompt({ //shorten the variable names returned
         type: "list",
         message: "Do you want to add a member to your team?",
         choices: ["engineer", "intern", "nope, that's it"],
         name: "another_teammate"
-    }).then(function (prompt) {
+    })
 
-        //Consider coding as switch case to make it faster
-        if (prompt.another_teammate === "engineer") {
+    switch (another_teammate) {
+        case "engineer":
             askEngineer();
-        } else if (prompt.another_teammate === "intern") {
+            break;
+        case "intern":
             askIntern();
-        } else {
+            break;
+        default:
             console.log("Done!")
-            //finish and run html
-            // console.log(employees);
+            console.log(employees); //How would I call something like this? 
             makeHTML();
-        }
-    });
+    }
+
+    // //Consider coding as switch case to make it faster
+    // if (prompt.another_teammate === "engineer") {
+    //     askEngineer();
+    // } else if (prompt.another_teammate === "intern") {
+    //     askIntern();
+    // } else {
+    //     console.log("Done!")
+    //     //finish and run html
+    //     console.log(employees); //How would I call something like this? 
+    //     makeHTML();
+    // }
+
 }
 
 async function askEngineer() {
-    await inquirer.prompt([
+    let { engineerName, engineerID, engineerEmail, githubId } = await inquirer.prompt([
         {
             type: "input",
             message: "What is your engineer's name?",
@@ -116,16 +129,14 @@ async function askEngineer() {
             message: "What is your engineer's gitHub ID?",
             name: "githubId"
         }
-    ]).then((data) => {
-        employeeIds.push(data.engineerID);
-        employees.push(new Engineer(data.engineerName, data.engineerID, data.engineerEmail, data.githubId));
-        askNext();
-
-    })
+    ])
+    employeeIds.push(engineerID);
+    employees.push(new Engineer(engineerName, engineerID, engineerEmail, githubId));
+    askNext();
 };
 
 async function askIntern() {
-    await inquirer.prompt([
+    let { internName, internID, internEmail, internSchool } = await inquirer.prompt([
         {
             type: "input",
             message: "What is your intern's name?",
@@ -147,11 +158,11 @@ async function askIntern() {
             message: "What is school does your intern attend?",
             name: "internSchool"
         }
-    ]).then((data) => {
-        employeeIds.push(data.internID);
-        employees.push(new Intern(data.internName, data.internID, data.internEmail, data.internSchool));
-        askNext();
-    })
+    ])
+    employeeIds.push(internID);
+    employees.push(new Intern(internName, internID, internEmail, internSchool));
+    askNext();
+
 };
 
 
@@ -161,7 +172,7 @@ askQuestions();
 function makeHTML() {
     const outputPath = path.resolve(__dirname, "output", "team.html");
 
-    const render = require("./lib/htmlRenderer");
+
     fs.writeFile(outputPath, render(employees), function (err) {
         if (err) {
             throw err;

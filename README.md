@@ -7,7 +7,7 @@ This app will generate an html development team page based on user inputs in the
 
 
 ## App passing tests
-![Command line jest run tests](./output/test.gif)
+![Command line jest run tests](./output/tests.gif)
 
 
 ## App user inputs and html rendering

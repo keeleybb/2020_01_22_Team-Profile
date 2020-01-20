@@ -30,28 +30,19 @@ function validateEmail(input) {
     return true;
 }
 
-async function askQuestions() {
-    let { managerName, managerId, managerEmail, managerNumber } = await askManager();
-    employeeIds.push(managerId);
-    employees.push(
-        new Manager(managerName, managerId, managerEmail, managerNumber)
-    );
-    askNext();
-
-}
-
-
-function askManager() {
+//Starter Function
+async function askManager() {
     console.log("Build your team");
-    return inquirer.prompt([{
+    let data = await inquirer.prompt([{
         type: "input",
         message: "What is your managers name?",
         name: "managerName"
     },
     {
         type: "input",
-        message: "What is your manager's number?",
-        name: "managerNumber"
+        message: "What is your manager's id?",
+        name: "managerId",
+        validate: validID
     },
     {
         type: "input",
@@ -61,18 +52,22 @@ function askManager() {
     },
     {
         type: "input",
-        message: "What is your manager's id?",
-        name: "managerId",
-        validate: validID
+        message: "What is your manager's number?",
+        name: "managerNumber"
     }
 
     ])
+    employeeIds.push(data.managerId);
+    employees.push(
+        new Manager(data.managerName, data.managerId, data.managerEmail, data.managerNumber)
+    );
+    askNext();
 
 
 }
 
 async function askNext() {
-    let { another_teammate } = await inquirer.prompt({ //shorten the variable names returned
+    let { another_teammate } = await inquirer.prompt({ //destructure to shorten the variable names returned
         type: "list",
         message: "Do you want to add a member to your team?",
         choices: ["engineer", "intern", "nope, that's it"],
@@ -87,27 +82,15 @@ async function askNext() {
             askIntern();
             break;
         default:
-            console.log("Done!")
-            console.log(employees); //How would I call something like this? 
+            // console.log("Done!")
+            // console.log(employees);
             makeHTML();
     }
-
-    // //Consider coding as switch case to make it faster
-    // if (prompt.another_teammate === "engineer") {
-    //     askEngineer();
-    // } else if (prompt.another_teammate === "intern") {
-    //     askIntern();
-    // } else {
-    //     console.log("Done!")
-    //     //finish and run html
-    //     console.log(employees); //How would I call something like this? 
-    //     makeHTML();
-    // }
 
 }
 
 async function askEngineer() {
-    let { engineerName, engineerID, engineerEmail, githubId } = await inquirer.prompt([
+    let data = await inquirer.prompt([
         {
             type: "input",
             message: "What is your engineer's name?",
@@ -130,13 +113,13 @@ async function askEngineer() {
             name: "githubId"
         }
     ])
-    employeeIds.push(engineerID);
-    employees.push(new Engineer(engineerName, engineerID, engineerEmail, githubId));
+    employeeIds.push(data.engineerID);
+    employees.push(new Engineer(data.engineerName, data.engineerID, data.engineerEmail, data.githubId));
     askNext();
 };
 
 async function askIntern() {
-    let { internName, internID, internEmail, internSchool } = await inquirer.prompt([
+    let data = await inquirer.prompt([
         {
             type: "input",
             message: "What is your intern's name?",
@@ -159,16 +142,18 @@ async function askIntern() {
             name: "internSchool"
         }
     ])
-    employeeIds.push(internID);
-    employees.push(new Intern(internName, internID, internEmail, internSchool));
+    employeeIds.push(data.internID);
+    employees.push(new Intern(data.internName, data.internID, data.internEmail, data.internSchool));
     askNext();
 
 };
 
 
-askQuestions();
+askManager(); //Kick it off
 
 
+
+//Make html - render needs variable
 function makeHTML() {
     const outputPath = path.resolve(__dirname, "output", "team.html");
 

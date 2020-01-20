@@ -4,6 +4,7 @@ const Intern = require("./lib/Intern");
 const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
+const render = require("./lib/htmlRenderer");
 
 //Holding Data
 const employeeIds = [];
@@ -29,24 +30,19 @@ function validateEmail(input) {
     return true;
 }
 
-async function askQuestions() {
-    await askManager();
-    await askNext();
-
-}
-
-
+//Starter Function
 async function askManager() {
     console.log("Build your team");
-    await inquirer.prompt([{
+    let data = await inquirer.prompt([{
         type: "input",
         message: "What is your managers name?",
         name: "managerName"
     },
     {
         type: "input",
-        message: "What is your manager's number?",
-        name: "managerNumber"
+        message: "What is your manager's id?",
+        name: "managerId",
+        validate: validID
     },
     {
         type: "input",
@@ -56,45 +52,45 @@ async function askManager() {
     },
     {
         type: "input",
-        message: "What is your manager's id?",
-        name: "managerId",
-        validate: validID
+        message: "What is your manager's number?",
+        name: "managerNumber"
     }
 
     ])
-        .then((data) => {
-            employeeIds.push(data.managerId);
-            employees.push(
-                new Manager(data.managerName, data.managerId, data.managerEmail, data.managerNumber)
-            );
+    employeeIds.push(data.managerId);
+    employees.push(
+        new Manager(data.managerName, data.managerId, data.managerEmail, data.managerNumber)
+    );
+    askNext();
 
-        });
+
 }
 
 async function askNext() {
-    await inquirer.prompt({
+    let { another_teammate } = await inquirer.prompt({ //destructure to shorten the variable names returned
         type: "list",
         message: "Do you want to add a member to your team?",
         choices: ["engineer", "intern", "nope, that's it"],
         name: "another_teammate"
-    }).then(function (prompt) {
+    })
 
-        //Consider coding as switch case to make it faster
-        if (prompt.another_teammate === "engineer") {
+    switch (another_teammate) {
+        case "engineer":
             askEngineer();
-        } else if (prompt.another_teammate === "intern") {
+            break;
+        case "intern":
             askIntern();
-        } else {
-            console.log("Done!")
-            //finish and run html
+            break;
+        default:
+            // console.log("Done!")
             // console.log(employees);
             makeHTML();
-        }
-    });
+    }
+
 }
 
 async function askEngineer() {
-    await inquirer.prompt([
+    let data = await inquirer.prompt([
         {
             type: "input",
             message: "What is your engineer's name?",
@@ -116,16 +112,14 @@ async function askEngineer() {
             message: "What is your engineer's gitHub ID?",
             name: "githubId"
         }
-    ]).then((data) => {
-        employeeIds.push(data.engineerID);
-        employees.push(new Engineer(data.engineerName, data.engineerID, data.engineerEmail, data.githubId));
-        askNext();
-
-    })
+    ])
+    employeeIds.push(data.engineerID);
+    employees.push(new Engineer(data.engineerName, data.engineerID, data.engineerEmail, data.githubId));
+    askNext();
 };
 
 async function askIntern() {
-    await inquirer.prompt([
+    let data = await inquirer.prompt([
         {
             type: "input",
             message: "What is your intern's name?",
@@ -147,21 +141,23 @@ async function askIntern() {
             message: "What is school does your intern attend?",
             name: "internSchool"
         }
-    ]).then((data) => {
-        employeeIds.push(data.internID);
-        employees.push(new Intern(data.internName, data.internID, data.internEmail, data.internSchool));
-        askNext();
-    })
+    ])
+    employeeIds.push(data.internID);
+    employees.push(new Intern(data.internName, data.internID, data.internEmail, data.internSchool));
+    askNext();
+
 };
 
 
-askQuestions();
+askManager(); //Kick it off
 
 
+
+//Make html - render needs variable
 function makeHTML() {
     const outputPath = path.resolve(__dirname, "output", "team.html");
 
-    const render = require("./lib/htmlRenderer");
+
     fs.writeFile(outputPath, render(employees), function (err) {
         if (err) {
             throw err;

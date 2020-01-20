@@ -1,4 +1,36 @@
-# New Homework Instructions
-For this homework you will build out the the files in the lib folder (except for the htmlRenderer). Use the test folder tests to build out the lib files. You will also build out the app.js file which when run will prompt the user for information about the team and on completion build out `team.html` in the `output` folder.  In your comments on submission write out an explanation of what the htmlRenderer file is doing.  
+# Development Team Webpage
+This app will generate an html development team page based on user inputs in the command line. Employee id and email address have simple validation. 
 
-##### hint hint, the things we left in app.js we for a reason.
+## Utilizing
+* Jest
+* Inquirer
+
+
+## App passing tests
+![Command line jest run tests](test.gif)
+
+
+## App user inputs and html rendering
+![Command line development team generator](questions.gif)
+
+# MIT License
+
+Copyright (c) [2020] [Keeley Byerly]
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. 
